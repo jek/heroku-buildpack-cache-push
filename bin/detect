@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Cache-Push"
+exit 0
