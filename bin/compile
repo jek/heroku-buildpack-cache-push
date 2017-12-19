@@ -5,22 +5,16 @@ ENV_DIR="$3"
 
 if [ -f "${BUILD_DIR}/__cached_slug__" ]; then
     rm ${BUILD_DIR}/__cached_slug__
-    echo "      Cached slug-guts ready for slugging."
+    echo "       Cached slug-guts ready for slugging."
     exit 0
 fi
 
-if [ "$(uname)" == Darwin ]; then
-    SHASUM=shasum
-else
-    SHASUM=sha256sum
+if [ ! -f "${BUILD_DIR}/__cache_build__" ]; then
+    echo "       No __cache_build__ marker in build dir: did you place the cache-pull buildpack before this one?"
+    exit 1
 fi
 
-BUILD_HASH=$(cd ${BUILD_DIR} && \
-             find . -type d -name .git -prune -o -type f -print0 | \
-             xargs -0 ${SHASUM} | \
-             sort | \
-             ${SHASUM} | \
-             cut -d' ' -f1)
+BUILD_HASH=$(cat "${BUILD_DIR}/__cache_build__")
 CACHE_FILE="${CACHE_DIR}/slug-cache/${BUILD_HASH}.tar.bz2"
 
 echo "      New build; caching as ${BUILD_HASH}."
